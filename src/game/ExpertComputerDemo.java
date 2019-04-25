@@ -185,7 +185,7 @@ class ExpertComputerDemo  {
         int howManyButtons = 1;
 
         for (int i = indexButton-(GameBoard.dimension - 1); i >0
-                && i % GameBoard.dimension == (i+ GameBoard.dimension - 1) % GameBoard.dimension - 1;
+                && i % GameBoard.dimension == (i+ (GameBoard.dimension - 1) % GameBoard.dimension )+ 1;
                 i -= (GameBoard.dimension - 1)) {
             //result &= (board.isCurrentPlayerSymbol(i, playerSymbol));
             howManyButtons++;
@@ -193,7 +193,7 @@ class ExpertComputerDemo  {
         }
 
         for (int i = indexButton+(GameBoard.dimension - 1); i < GameBoard.dimension*GameBoard.dimension
-                && i % GameBoard.dimension == ((i- GameBoard.dimension - 1) % GameBoard.dimension - 1);
+                && i % GameBoard.dimension == (i- (GameBoard.dimension - 1) % GameBoard.dimension) - 1;
              i += (GameBoard.dimension - 1)) {
             //result &=(board.isCurrentPlayerSymbol(i,playerSymbol));
             howManyButtons++;

@@ -1,10 +1,13 @@
 package game;
 /*
-      Интелект "Без шансов" для пользователя разработан с применением банального перечисления
-      вариантов. Он работает только для поля 3*3 и неподходит не для какого другого поля
-      Для того чтобы не захламлять класс GameActionListener  я вынес его в отдельно.
-       Понимаю что это откровенный говно-код. Но хотелось сделать что то
-      абсолютно непобедимое.
+      Интелект "Умный компьютер" создан с применением анализа игрового поля.
+      Сначала он анализирует может ли он сделать победный ход и если может делает его.
+      Потом он анализирует сможет ли потивник сделать победный ход следующим шагом и если да то ставит свой символ туда.
+      Затем он проверяет руководствуясь предыдущим анализом первый ли это хо. И если первый то если центральная клетка
+      не занята ставит символ туда, если занята то генерирует случайное число и ставит символ в клетку с этим индексом
+      Если ход не первый то руководствуясь предыдущим анализом атакует.
+      Я специально сделал одну прореху в логике. Что бы у пользователя оставался шанс выйграть. Это всего лишь одна
+      последовательность ходов.
 */
 
 import java.util.Random;
@@ -26,82 +29,24 @@ class ExpertComputerDemo  {
 
       int expertComputerStep() {
 
-        int computerStep = -1;
-        int computerStepPoints=0;
+        int computerStep ;
+        int computerStepPoints;
+        int [] computerStepArr;
 
+       computerStepArr = cycleAnalysisField(computerSymbol);
+       computerStep = computerStepArr[0];
+       computerStepPoints = computerStepArr[1];
 
-
-       for (int i = 0; i < GameBoard.dimension*GameBoard.dimension; i++) {
-           int buttonPoint;
-           if(board.isTurnable(i / GameBoard.dimension,i % GameBoard.dimension)){
-               buttonPoint=verticalCheck(i,computerSymbol);
-               if(buttonPoint > computerStepPoints){
-                   computerStep = i;
-                   computerStepPoints=buttonPoint;
-               }
-               buttonPoint=horizontalCheck(i,computerSymbol);
-               if(buttonPoint > computerStepPoints){
-                   computerStep = i;
-                   computerStepPoints=buttonPoint;
-               }
-               buttonPoint=upDownDiagonal(i,computerSymbol);
-               if(buttonPoint > computerStepPoints){
-                   computerStep = i;
-                   computerStepPoints=buttonPoint;
-               }
-               buttonPoint=downUpDiagonal(i,computerSymbol);
-               if(buttonPoint > computerStepPoints){
-                   computerStep = i;
-                   computerStepPoints=buttonPoint;
-               }
-           }
-       }
        if(computerStepPoints < GameBoard.dimension){
-           int playerWinStep = -1;
-           int playerWinStepPoints = 0;
-           for (int i = 0; i < GameBoard.dimension*GameBoard.dimension; i++) {
-               int buttonPoint;
-               if(board.isTurnable(i / GameBoard.dimension,i % GameBoard.dimension)){
-                   buttonPoint=verticalCheck(i,realPlayerSymbol);
-                   if(buttonPoint > playerWinStepPoints){
-                       playerWinStep = i;
-                       playerWinStepPoints=buttonPoint;
-                   }
-                   buttonPoint=horizontalCheck(i,realPlayerSymbol);
-                   if(buttonPoint > playerWinStepPoints){
-                       playerWinStep = i;
-                       playerWinStepPoints=buttonPoint;
-                   }
-                   buttonPoint=upDownDiagonal(i,realPlayerSymbol);
-                   if(buttonPoint > playerWinStepPoints){
-                       playerWinStep = i;
-                       playerWinStepPoints=buttonPoint;
-                   }
-                   buttonPoint=downUpDiagonal(i,realPlayerSymbol);
-                   if(buttonPoint > playerWinStepPoints){
-                       playerWinStep = i;
-                       playerWinStepPoints=buttonPoint;
-                   }
-               }
-           }
-           if(playerWinStepPoints==GameBoard.dimension){
-               computerStep = playerWinStep;
-               computerStepPoints = playerWinStepPoints;
+           computerStepArr = cycleAnalysisField(realPlayerSymbol);
+           if(computerStepArr[1]==GameBoard.dimension){
+               computerStep = computerStepArr[0];
+               computerStepPoints = computerStepArr[1];
            }
        }
 
        if(computerStepPoints == 1){
-           if(board.isTurnable( (GameBoard.dimension*GameBoard.dimension/2)/ GameBoard.dimension,
-                   (GameBoard.dimension*GameBoard.dimension/2) % GameBoard.dimension)){
-               computerStep = GameBoard.dimension*GameBoard.dimension/2;
-           }else {
-               Random random = new Random();
-               int randomInt;
-               do{
-                   randomInt = random.nextInt(GameBoard.dimension*GameBoard.dimension-1);
-               }while(!board.isTurnable(randomInt / GameBoard.dimension,randomInt % GameBoard.dimension));
-
-           }
+           computerStep=firstComputerStep();
        }
 
         board.updateGameField(computerStep/GameBoard.dimension,computerStep % GameBoard.dimension);
@@ -109,21 +54,68 @@ class ExpertComputerDemo  {
 
    }
 
+   private int [] cycleAnalysisField(char playerSymbol){
+       int [] playerWinStep = new int[] {-1,0};
+       for (int i = 0; i < GameBoard.dimension*GameBoard.dimension; i++) {
+           int buttonPoint;
+           if(board.isTurnable(i / GameBoard.dimension,i % GameBoard.dimension)){
+               buttonPoint=verticalCheck(i,playerSymbol);
+               if(buttonPoint > playerWinStep[1]){
+                   playerWinStep[0] = i;
+                   playerWinStep[1]=buttonPoint;
+               }
+               buttonPoint=horizontalCheck(i,playerSymbol);
+               if(buttonPoint > playerWinStep[1]){
+                   playerWinStep[0] = i;
+                   playerWinStep[1]=buttonPoint;
+               }
+               buttonPoint=upDownDiagonal(i,playerSymbol);
+               if(buttonPoint > playerWinStep[1]){
+                   playerWinStep[0] = i;
+                   playerWinStep[1]=buttonPoint;
+               }
+               buttonPoint=downUpDiagonal(i,playerSymbol);
+               if(buttonPoint > playerWinStep[1]){
+                   playerWinStep[0] = i;
+                   playerWinStep[1]=buttonPoint;
+               }
+           }
+       }
+       return playerWinStep;
+
+   }
+
+   private int firstComputerStep(){
+        int firstComputerStep;
+       if(board.isTurnable( (GameBoard.dimension*GameBoard.dimension/2)/ GameBoard.dimension,
+               (GameBoard.dimension*GameBoard.dimension/2) % GameBoard.dimension)){
+           firstComputerStep = GameBoard.dimension*GameBoard.dimension/2;
+       }else {
+           Random random = new Random();
+           int randomInt;
+           do{
+               randomInt = random.nextInt(GameBoard.dimension*GameBoard.dimension-1);
+           }while(!board.isTurnable(randomInt / GameBoard.dimension,randomInt % GameBoard.dimension));
+           firstComputerStep = randomInt;
+
+       }
+
+        return firstComputerStep;
+   }
+
+
 
     private int verticalCheck(int indexButton, char playerSymbol){
-        //boolean result=true;
         int howManyTrue=1;
         int howManyButtons = 1;
 
         for (int i = (indexButton - GameBoard.dimension); i >= 0; i -= GameBoard.dimension) {
-                //result &= (board.isCurrentPlayerSymbol(i, playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }
 
         for (int i = (indexButton + GameBoard.dimension); i < GameBoard.dimension*GameBoard.dimension;
              i+=GameBoard.dimension) {
-           // result &=(board.isCurrentPlayerSymbol(i,playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }
@@ -133,12 +125,11 @@ class ExpertComputerDemo  {
         return howManyTrue;
     }
     private int horizontalCheck(int indexButton,char playerSymbol){
-        //boolean result=true;
+
         int howManyTrue=1;
         int howManyButtons = 1;
 
         for (int i = indexButton-1; i>=0 && i % GameBoard.dimension != GameBoard.dimension-1 ; i --) {
-            //result &= (board.isCurrentPlayerSymbol(i, playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }
@@ -147,29 +138,24 @@ class ExpertComputerDemo  {
 
         for (int i = indexButton + 1; i < GameBoard.dimension*GameBoard.dimension && i % GameBoard.dimension!=0;
              i++) {
-              //  result &=(board.isCurrentPlayerSymbol(i,playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }
-
         howManyTrue=(howManyButtons==GameBoard.dimension)? howManyTrue:0;
 
         return howManyTrue;
     }
     private int upDownDiagonal(int indexButton, char playerSymbol){
-        //boolean result=true;
         int howManyTrue=1;
         int howManyButtons = 1;
 
         for (int i = indexButton-(GameBoard.dimension +1); i >=0 ; i -=(GameBoard.dimension +1)) {
-            //result &= (board.isCurrentPlayerSymbol(i, playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
 
         }
         for (int i = indexButton + (GameBoard.dimension+1); i < GameBoard.dimension*GameBoard.dimension;
              i+=(GameBoard.dimension+1)) {
-            //result &=(board.isCurrentPlayerSymbol(i,playerSymbol));howManyButtons++;
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
 
@@ -180,14 +166,12 @@ class ExpertComputerDemo  {
     }
 
     private int downUpDiagonal(int indexButton, char playerSymbol){
-        //boolean result=true;
         int howManyTrue=1;
         int howManyButtons = 1;
 
         for (int i = indexButton-(GameBoard.dimension - 1); i >0
                 && i % GameBoard.dimension == (i+ (GameBoard.dimension - 1) % GameBoard.dimension )+ 1;
                 i -= (GameBoard.dimension - 1)) {
-            //result &= (board.isCurrentPlayerSymbol(i, playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }
@@ -195,7 +179,6 @@ class ExpertComputerDemo  {
         for (int i = indexButton+(GameBoard.dimension - 1); i < GameBoard.dimension*GameBoard.dimension
                 && i % GameBoard.dimension == (i- GameBoard.dimension + 1) % GameBoard.dimension - 1;
              i += (GameBoard.dimension - 1)) {
-            //result &=(board.isCurrentPlayerSymbol(i,playerSymbol));
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
         }

@@ -34,7 +34,7 @@ import java.awt.*;
         controlPanel.add(newGameButton);
         controlPanel.setSize(sellSize*dimension,150);
 
-        String[] levels=new String[]{"Тупой компьютер","Умный компьютер","Без шансов (DEMO)"};
+        String[] levels=new String[]{"Тупой компьютер","Средний компьютер","Умный компьютер (DEMO)"};
         JComboBox <String> levelInput = new JComboBox <> (levels);
         levelInput.setEditable(true);
         levelInput.addActionListener((e)-> levelNumber = levelInput.getSelectedIndex());

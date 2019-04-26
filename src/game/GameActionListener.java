@@ -23,6 +23,7 @@ public class GameActionListener implements ActionListener {
             updateByPlayersDate(board);
             if(board.isFull()){
                 board.getGame().showMessage("Ничья!");
+                board.emptyField();
             }
             else{
                 updateByAiDate(board);

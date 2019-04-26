@@ -22,16 +22,20 @@ public class GameActionListener implements ActionListener {
         if(board.isTurnable(rowNum, cellNum)){
             updateByPlayersDate(board);
             if(board.isFull()){
-                board.getGame().showMessage("Ничья!");
-                board.emptyField();
+                notWinner(board);
             }
             else{
                 updateByAiDate(board);
+                if(board.isFull())notWinner(board);
             }
         }
         else {
             board.getGame().showMessage("Вы ввели некорректное поле!");
         }
+    }
+    private void notWinner(GameBoard board){
+        board.getGame().showMessage("Ничья!");
+        board.emptyField();
     }
 
     private void updateByPlayersDate(GameBoard board){
@@ -52,6 +56,7 @@ public class GameActionListener implements ActionListener {
                 cellIndex=smartComputerStep(board);
                 break;
             case 2:
+            case 3:
                 ExpertComputerDemo expertComputerDemo = new ExpertComputerDemo(button.getBoard());
                 cellIndex=expertComputerDemo.expertComputerStep();
                 break;

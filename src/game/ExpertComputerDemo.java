@@ -6,8 +6,7 @@ package game;
       Затем он проверяет руководствуясь предыдущим анализом первый ли это хо. И если первый то если центральная клетка
       не занята ставит символ туда, если занята то генерирует случайное число и ставит символ в клетку с этим индексом
       Если ход не первый то руководствуясь предыдущим анализом атакует.
-      Я специально сделал одну прореху в логике. Что бы у пользователя оставался шанс выйграть. Это всего лишь одна
-      последовательность ходов.
+      Я специально сделал прореху в логике. Что бы у пользователя оставался шанс выйграть.
 */
 
 import java.util.Random;
@@ -170,7 +169,7 @@ class ExpertComputerDemo  {
         int howManyButtons = 1;
 
         for (int i = indexButton-(GameBoard.dimension - 1); i >0
-                && i % GameBoard.dimension == (i+ (GameBoard.dimension - 1) % GameBoard.dimension )+ 1;
+                && i % GameBoard.dimension == (i+ GameBoard.dimension - 1) % GameBoard.dimension + 1;
                 i -= (GameBoard.dimension - 1)) {
             howManyButtons++;
             if(board.isCurrentPlayerSymbol(i, playerSymbol)) howManyTrue++;
